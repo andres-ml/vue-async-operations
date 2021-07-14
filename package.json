@@ -1,5 +1,5 @@
 {
-  "name": "vue-async-operations",
+  "name": "@andres-ml/vue-async-operations",
   "description": "Managing async operations statuses in your Vue components",
   "version": "1.0.2",
   "author": {
@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devstark-com/vue-async-operations.git"
+    "url": "git+https://github.com/andres-ml/vue-async-operations.git"
   },
   "bugs": {
-    "url": "https://github.com/devstark-com/vue-async-operations/issues"
+    "url": "https://github.com/andres-ml/vue-async-operations/issues"
   },
-  "homepage": "https://github.com/devstark-com/vue-async-operations#readme",
+  "homepage": "https://github.com/andres-ml/vue-async-operations#readme",
   "devDependencies": {
     "babel-core": "^6.0.0",
     "babel-eslint": "^7.1.1",
