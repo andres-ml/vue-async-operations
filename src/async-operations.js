@@ -55,6 +55,7 @@ export default {
     return {
       $type: type,
       $pending: null,
+      $args: null,
       $resolved: null,
       $rejected: null,
       $err: null,
@@ -82,7 +83,7 @@ export default {
     let state = resolvePath(batchPath, vm.$data[this.cfg.dataPropName])
     const batch = resolvePath(batchPath, vm.$options[this.cfg.componentOptionName])
 
-    this.resetStates(vm, state)
+    this.resetStates(vm, state, args)
     return new Promise((resolve, reject) => {
       const arr = Object.entries(batch).map(([key, value]) => {
         const childPath = batchPath + '.' + key
@@ -107,7 +108,7 @@ export default {
     let state = resolvePath(funcPath, vm.$data[this.cfg.dataPropName])
     const func = resolvePath(funcPath, vm.$options[this.cfg.componentOptionName])
 
-    this.resetStates(vm, state)
+    this.resetStates(vm, state, args)
     return new Promise((resolve, reject) => {
       let result
       if (typeof func === 'string') result = vm[func](...args)
@@ -131,11 +132,12 @@ export default {
     })
   },
 
-  resetStates (vm, state) {
+  resetStates (vm, state, args) {
     vm.$set(state, '$err', null)
     vm.$set(state, '$rejected', false)
     vm.$set(state, '$resolved', false)
     vm.$set(state, '$pending', true)
+    vm.$set(state, '$args', args)
   },
 
   handleResolve (vm, state, result, resolve) {

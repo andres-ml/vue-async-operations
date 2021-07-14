@@ -130,6 +130,17 @@ created () {
 //...
 ```
 
+You can access the passed arguments through `$args`. This can be useful when you have multiple, similar calls to the same operation:
+```html
+<button
+  v-for="(item, index) in items" :key="index"
+  :disabled="$async.delete.$pending && $async.delete.$args[1] === index"
+  @click="() => $async.delete.$perform(index)"
+>
+  Delete item #{{ index }}
+</button>
+```
+
 ### Handle operation result 
 
 The `.$perform()` method of an operation returns `Promise` and passes the result of the original promise into `resolve` and `reject` methods:
@@ -230,6 +241,10 @@ Then, use separate and aggregated reactive statuses
 ### Operation methods
 
 - `$perform`
+
+### Operation context
+
+- `$args`
 
 ### Plugin options
 
