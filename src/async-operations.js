@@ -58,6 +58,7 @@ export default {
       $args: null,
       $resolved: null,
       $rejected: null,
+      $requestId: null,
       $err: null,
       $perform: (...args) => {
         const relPath = path.split('.').filter(el => el !== this.cfg.dataPropName).join('.')
@@ -84,6 +85,8 @@ export default {
     const batch = resolvePath(batchPath, vm.$options[this.cfg.componentOptionName])
 
     this.resetStates(vm, state, args)
+
+    const requestId = state.$requestId
     return new Promise((resolve, reject) => {
       const arr = Object.entries(batch).map(([key, value]) => {
         const childPath = batchPath + '.' + key
@@ -93,8 +96,8 @@ export default {
         return child.$perform(operationArgs)
       })
       Promise.all(arr).then(
-        result => this.handleResolve(vm, state, result, resolve),
-        err => this.handleReject(vm, state, err, reject)
+        result => this.handleResolve(vm, state, result, resolve, requestId),
+        err => this.handleReject(vm, state, err, reject, requestId)
       )
     })
   },
@@ -109,6 +112,8 @@ export default {
     const func = resolvePath(funcPath, vm.$options[this.cfg.componentOptionName])
 
     this.resetStates(vm, state, args)
+
+    const requestId = state.$requestId
     return new Promise((resolve, reject) => {
       let result
       if (typeof func === 'string') result = vm[func](...args)
@@ -118,16 +123,16 @@ export default {
 
       if (Array.isArray(result)) {
         return Promise.all(result).then(
-          res => this.handleResolve(vm, state, res, resolve),
-          err => this.handleReject(vm, state, err, reject)
+          res => this.handleResolve(vm, state, res, resolve, requestId),
+          err => this.handleReject(vm, state, err, reject, requestId)
         )
       }
 
       if (!result.then) return this.handleResolve(vm, state, result, resolve)
 
       result.then(
-        res => this.handleResolve(vm, state, res, resolve),
-        err => this.handleReject(vm, state, err, reject)
+        res => this.handleResolve(vm, state, res, resolve, requestId),
+        err => this.handleReject(vm, state, err, reject, requestId)
       )
     })
   },
@@ -138,18 +143,23 @@ export default {
     vm.$set(state, '$resolved', false)
     vm.$set(state, '$pending', true)
     vm.$set(state, '$args', args)
+    vm.$set(state, '$requestId', state.$requestId !== null ? state.$requestId + 1 : 0)
   },
 
-  handleResolve (vm, state, result, resolve) {
+  handleResolve (vm, state, result, resolve, requestId) {
     resolve(result)
-    vm.$set(state, '$pending', false)
-    vm.$set(state, '$resolved', true)
+    if (requestId === state.$requestId) {
+      vm.$set(state, '$pending', false)
+      vm.$set(state, '$resolved', true)
+    }
   },
 
-  handleReject (vm, state, err, reject) {
+  handleReject (vm, state, err, reject, requestId) {
     reject(err)
-    vm.$set(state, '$pending', false)
-    vm.$set(state, '$rejected', true)
-    vm.$set(state, '$err', err)
+    if (requestId === state.$requestId) {
+      vm.$set(state, '$pending', false)
+      vm.$set(state, '$rejected', true)
+      vm.$set(state, '$err', err)
+    }
   },
 }

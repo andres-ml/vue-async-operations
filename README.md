@@ -231,6 +231,11 @@ Then, use separate and aggregated reactive statuses
 //...
 ```
 
+### Concurrent calls
+If `$perform` is called multiple consecutive times before the first call has resolved, all of them will resolve/reject, but only the last one will also modify the state (`$pending/$rejected/$resolved`).
+
+Each consecutive call will increment `$requestId` (which starts at `null` before the first call, then `0`, `1`, and so on).
+
 ### Operation states
 
 - `$pending`
@@ -245,6 +250,7 @@ Then, use separate and aggregated reactive statuses
 ### Operation context
 
 - `$args`
+- `$requestId`
 
 ### Plugin options
 
